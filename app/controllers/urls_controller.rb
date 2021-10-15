@@ -14,7 +14,7 @@ class UrlsController < ApplicationController
       redirect_to url_path(@url.short_url)
     else
       flash[:error] = 'Url cant be created.'
-      redirect_to url_path(@url.short_url)
+      redirect_to root_path
     end
   end
 

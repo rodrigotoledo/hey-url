@@ -2,6 +2,15 @@
 
 class Url < ApplicationRecord
   before_create :generate_short_url
+  has_many :clicks
+  validates :original_url, uniqueness: true, presence: true
+
+  require 'uri'
+  validates_each :original_url do |record, attr, value|
+    unless value =~ /\A#{URI::regexp(['http', 'https'])}\z/
+      record.errors.add(attr, 'invalid url')
+    end
+  end
 
   private
     def generate_short_url

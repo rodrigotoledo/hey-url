@@ -46,10 +46,21 @@ RSpec.feature "URLs controller management", :type => :feature do
     scenario 'User create URL with success' do
       fill_in "url_original_url",	with: "https://facebook.com"
       click_button 'Shorten URL'
+      expect(page).to have_text('Url was successfully created.')
+      expect(current_path).to eq(url_path(Url.last.short_url))
     end
 
-    scenario 'User have error trying to create URL' do
+    scenario 'User have error trying to create URL without url' do
+      click_button 'Shorten URL'
+      expect(page).to have_text('Url cant be created.')
+      expect(current_path).to eq(root_path)
+    end
 
+    scenario 'User have error trying to create URL with invalid url' do
+      fill_in "url_original_url",	with: "blablabla"
+      click_button 'Shorten URL'
+      expect(page).to have_text('Url cant be created.')
+      expect(current_path).to eq(root_path)
     end
   end
 end
