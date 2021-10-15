@@ -4,20 +4,23 @@ class UrlsController < ApplicationController
   def index
     # recent 10 short urls
     @url = Url.new
-    @urls = [
-      Url.new(short_url: 'ABCDE', original_url: 'http://google.com', created_at: Time.now),
-      Url.new(short_url: 'ABCDG', original_url: 'http://facebook.com', created_at: Time.now),
-      Url.new(short_url: 'ABCDF', original_url: 'http://yahoo.com', created_at: Time.now)
-    ]
+    @urls = Url.order(updated_at: :desc).limit(10)
   end
 
   def create
-    raise 'add some code'
-    # create a new URL record
+    @url = Url.new(url_params)
+    if @url.save
+      flash[:success] = 'Url was successfully created.'
+      redirect_to url_path(@url.short_url)
+    else
+      flash[:error] = 'Url cant be created.'
+      redirect_to root_path
+    end
   end
 
   def show
-    @url = Url.new(short_url: 'ABCDE', original_url: 'http://google.com', created_at: Time.now)
+    @url = Url.find_by_short_url(params[:url])
+    raise 'invalid URL' if @url.nil?
     # implement queries
     @daily_clicks = [
       ['1', 13],
@@ -43,10 +46,17 @@ class UrlsController < ApplicationController
       ['Ubuntu', 17],
       ['Other', 7]
     ]
+  rescue
+    render file: "#{Rails.root}/public/404.html", status: :not_found
   end
 
   def visit
     # params[:short_url]
     render plain: 'redirecting to url...'
   end
+
+  private
+    def url_params
+      params.require(:url).permit(:original_url)
+    end
 end
