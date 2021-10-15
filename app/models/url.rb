@@ -12,6 +12,28 @@ class Url < ApplicationRecord
     end
   end
 
+  def generate_click_info(request)
+    user_agent = UserAgent.parse(request.env['HTTP_USER_AGENT'])
+    click = clicks.build
+    click.browser = user_agent.browser
+    click.platform = user_agent.platform
+    click.save
+    touch(:updated_at)
+  end
+
+  def daily_clicks
+    dates_in_month = (created_at.to_date.beginning_of_month..created_at.to_date.end_of_month).to_a
+    dates_in_month.map do |date|
+      [
+        date.day.to_s,
+        Url.where(
+          created_at: date.to_time.beginning_of_day..date.to_time.end_of_day,
+          short_url: short_url
+        ).sum(:clicks_count)
+      ]
+    end
+  end
+
   private
     def generate_short_url
       require 'securerandom'

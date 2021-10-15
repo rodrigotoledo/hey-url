@@ -10,76 +10,39 @@ require 'webdrivers'
 # https://api.rubyonrails.org/v5.2/classes/ActionDispatch/SystemTestCase.html
 
 RSpec.describe 'Short Urls', type: :system do
+  let(:google_url) { create(:url, original_url: 'https://www.google.com') }
+
   before do
     driven_by :selenium, using: :chrome
-    # If using Firefox
-    # driven_by :selenium, using: :firefox
-    #
-    # If running on a virtual machine or similar that does not have a UI, use
-    # a headless driver
-    # driven_by :selenium, using: :headless_chrome
-    # driven_by :selenium, using: :headless_firefox
   end
 
-  describe 'index' do
-    it 'shows a list of short urls' do
+  describe 'generate graphical info' do
+    before do
+      google_url.update_attribute(:short_url, 'ABCDE')
       visit root_path
-      expect(page).to have_text('HeyURL!')
-      # expect page to show 10 urls
+      click_link(href: visit_path(google_url.short_url))
+    end
+
+    it 'increments clicks for URL' do
+      expect(google_url.clicks.count).to eq(1)
+    end
+
+    it 'have platform info' do
+      expect(google_url.clicks.first.platform).not_to be_empty
+    end
+
+    it 'have browser info' do
+      expect(google_url.clicks.first.browser).not_to be_empty
     end
   end
 
-  describe 'show' do
-    it 'shows a panel of stats for a given short url' do
-      visit url_path('ABCDE')
-      # expect page to show the short url
+  describe 'have error to try generate graphical info' do
+    before do
+      visit visit_path('asdsadasdasdsa')
     end
 
-    context 'when not found' do
-      it 'shows a 404 page' do
-        visit url_path('NOTFOUND')
-        # expect page to be a 404
-      end
-    end
-  end
-
-  describe 'create' do
-    context 'when url is valid' do
-      it 'creates the short url' do
-        visit '/'
-        # add more expections
-      end
-
-      it 'redirects to the home page' do
-        visit '/'
-        # add more expections
-      end
-    end
-
-    context 'when url is invalid' do
-      it 'does not create the short url and shows a message' do
-        visit '/'
-        # add more expections
-      end
-
-      it 'redirects to the home page' do
-        visit '/'
-        # add more expections
-      end
-    end
-  end
-
-  describe 'visit' do
-    it 'redirects the user to the original url' do
-      visit visit_path('ABCDE')
-      # add more expections
-    end
-
-    context 'when not found' do
-      it 'shows a 404 page' do
-        visit visit_path('NOTFOUND')
-        # expect page to be a 404
-      end
+    it 'render invalid page with 404 code' do
+      expect(page).to have_text("The page you were looking for doesn't exist.")
     end
   end
 end

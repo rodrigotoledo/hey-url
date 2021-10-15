@@ -22,18 +22,7 @@ class UrlsController < ApplicationController
     @url = Url.find_by_short_url(params[:url])
     raise 'invalid URL' if @url.nil?
     # implement queries
-    @daily_clicks = [
-      ['1', 13],
-      ['2', 2],
-      ['3', 1],
-      ['4', 7],
-      ['5', 20],
-      ['6', 18],
-      ['7', 10],
-      ['8', 20],
-      ['9', 15],
-      ['10', 5]
-    ]
+    @daily_clicks = @url.daily_clicks
     @browsers_clicks = [
       ['IE', 13],
       ['Firefox', 22],
@@ -51,8 +40,12 @@ class UrlsController < ApplicationController
   end
 
   def visit
-    # params[:short_url]
-    render plain: 'redirecting to url...'
+    @url = Url.find_by_short_url(params[:short_url])
+    @url.generate_click_info(request)
+
+    return redirect_to @url.original_url, status: 301
+  rescue
+    render file: "#{Rails.root}/public/404.html", status: :not_found
   end
 
   private
