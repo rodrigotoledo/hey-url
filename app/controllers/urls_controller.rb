@@ -21,20 +21,9 @@ class UrlsController < ApplicationController
   def show
     @url = Url.find_by_short_url(params[:url])
     raise 'invalid URL' if @url.nil?
-    # implement queries
     @daily_clicks = @url.daily_clicks
-    @browsers_clicks = [
-      ['IE', 13],
-      ['Firefox', 22],
-      ['Chrome', 17],
-      ['Safari', 7]
-    ]
-    @platform_clicks = [
-      ['Windows', 13],
-      ['macOS', 22],
-      ['Ubuntu', 17],
-      ['Other', 7]
-    ]
+    @browsers_clicks = @url.browsers_clicks
+    @platform_clicks = @url.platform_clicks
   rescue
     render file: "#{Rails.root}/public/404.html", status: :not_found
   end

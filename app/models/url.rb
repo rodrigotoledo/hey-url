@@ -34,6 +34,14 @@ class Url < ApplicationRecord
     end
   end
 
+  def browsers_clicks
+    clicks.group(:browser).count.to_a
+  end
+
+  def platform_clicks
+    clicks.group(:platform).count.to_a
+  end
+
   private
     def generate_short_url
       require 'securerandom'
