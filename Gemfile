@@ -49,6 +49,9 @@ group :development, :test do
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
   gem 'factory_bot_rails'
   gem 'rspec-rails', '~> 3.7'
+
+  gem 'faker'
+  gem 'guard-rspec', require: false
 end
 
 group :development do
@@ -65,7 +68,10 @@ group :test do
   gem 'capybara', '>= 3'
   # https://github.com/titusfortner/webdrivers
   gem 'webdrivers', '~> 4.0', require: false
+  gem 'simplecov', require: false
+  gem 'shoulda-matchers', '~> 5.0'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
+gem 'useragent'
