@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :url do
-    short_url { 'ABCDE' }
+    sequence(:short_url) { |i| "#{i}BCDE" }
     sequence(:original_url) { |i| "https://domain#{i}.com/path" }
   end
 end
